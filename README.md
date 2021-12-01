@@ -1,4 +1,4 @@
-Spbu timetble site parser
+Spbu timetable site parser
 
 install requirements
 

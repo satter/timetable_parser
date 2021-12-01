@@ -64,8 +64,13 @@ for day in timetable_html:
                 event_time = lesson.find_all('span', {"title": "Заменены дата/время"})[0].string.strip()
             else:
                 event_time = lesson.find_all('span', {"title": "Время"})[0].string.strip()
-            event_start_string = event_day + ' ' + event_time.split('\u2013')[0]
-            event_end_string = event_day + ' ' + event_time.split('\u2013')[1]
+            #workaround for undefined end time
+            if "\u2013" in  event_time:
+                event_start_string = event_day + ' ' + event_time.split('\u2013')[0]
+                event_end_string = event_day + ' ' + event_time.split('\u2013')[1]
+            else:
+                event_start_string = event_day + ' ' + event_time
+                event_end_string = event_day + ' ' + event_time
 
             #type and title
             if len(lesson.find_all('span', {"title": "Добавлено занятие"})):
