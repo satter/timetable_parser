@@ -82,6 +82,7 @@ for day in timetable_html:
             event_type = event_string.split(',')[1].strip()
 
             #location
+            #support for empty location or lecturer needed
             if len(lesson.find_all('div', {"title": "Места проведения занятия"})) > 0:
                 event_location_string = lesson.find_all('div', {"title": "Места проведения занятия"})[0].find('span').string.strip()
             elif len(lesson.find_all('div', {"title": "Заменены места проведения занятия"})) > 0:
@@ -99,6 +100,7 @@ for day in timetable_html:
                 event_location = event_location_string
 
             #lecturers
+            #support for empty location or lecturer needed
             if len(lesson.find_all('span', {"title": "Преподаватели"})) > 0:
                 lecturers=lesson.find_all('span', {"title": "Преподаватели"})
                 if isinstance(lecturers[0].string, str):
@@ -110,7 +112,7 @@ for day in timetable_html:
                     event_lecturers_list = [lesson.find_all('span', {"title": "Преподаватели"})[0].find('a').string.strip()]
             else:
                 #here also can be multiple lecturers
-                event_lecturers_list = lesson.find_all('span', {"title": "Заменены преподаватели"})[0].find('a').string.strip()
+                event_lecturers_list = [lesson.find_all('span', {"title": "Заменены преподаватели"})[0].find('a').string.strip()]
             event_lecturers = ", ".join(event_lecturers_list)
 
             #time to event
@@ -121,7 +123,7 @@ for day in timetable_html:
                 time_to_event = "passed"
             else:
                 tte_days, tte_hours, tte_minutes = delta.days, delta.seconds // 3600, delta.seconds // 60 % 60
-                time_to_event = f"{tte_days}:{tte_hours}:{tte_minutes}"
+                time_to_event = f"{tte_days}:{tte_hours:02d}:{tte_minutes:02d}"
 
             #resulting event
             event = {
