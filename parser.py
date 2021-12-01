@@ -17,26 +17,27 @@ def parse_args(args=sys.argv[1:]):
         description=sys.modules[__name__].__doc__)
 
     parser.add_argument("--date", type=str, default='', help="date to parse, format YYYY-MM-DD")
+    parser.add_argument("--id", type=str, default='303104', help="group id for timetable, part of url, get one on https://timetable.spbu.ru/")
     parser.add_argument('--no-tls-verify', dest='tls_validation', action='store_false', default=True, help="disable TLS verification in requests library")
     return parser.parse_args(args)
 
 options = parse_args()
 
-BASE_URL = 'https://timetable.spbu.ru/AMCP/StudentGroupEvents/Primary/303104/'
+base_url = f'https://timetable.spbu.ru/AMCP/StudentGroupEvents/Primary/{options.id}/'
+
 
 if len(options.date)>0:
     try:
         datetime.datetime.strptime(options.date, '%Y-%m-%d')
-        url = BASE_URL + options.date
+        url = base_url + options.date
     except ValueError:
         print('Error prasing date format, use YYYY-MM-DD')
         sys.exit(1)
 else:
-    url = BASE_URL
+    url = base_url
 
 setcookie={'_culture': 'ru'}
 r = requests.get(url, cookies=setcookie,  verify=options.tls_validation)
-#r = requests.get(url, cookies=setcookie,)
 soup = BeautifulSoup(r.text, 'html.parser')
 
 timetable_html = soup.find_all("div", {"class": "panel-group"})[0]
@@ -115,12 +116,12 @@ for day in timetable_html:
                 time_to_event = "passed"
             else:
                 tte_days, tte_hours, tte_minutes = delta.days, delta.seconds // 3600, delta.seconds // 60 % 60
-                time_to_event = f"D: {tte_days} H: {tte_hours} M: {tte_minutes}"
+                time_to_event = f"{tte_days}:{tte_hours}:{tte_minutes}"
 
             #resulting event
             event = {
               'start': event_start,
-              'tte': time_to_event,
+              'D:H:M': time_to_event,
               'end': event_end,
               'type': event_type,
               'title': event_title,
