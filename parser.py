@@ -103,11 +103,17 @@ for day in timetable_html:
             #support for empty location or lecturer needed
             if len(lesson.find_all('span', {"title": "Преподаватели"})) > 0:
                 lecturers=lesson.find_all('span', {"title": "Преподаватели"})
+                try:
+                    non_person=lecturers[0].find('span', {"class": "moreinfo"})
+                except:
+                    pass
                 if isinstance(lecturers[0].string, str):
                     event_lecturers_list = []
                     for lecturer in lecturers:
                         if len(lecturer.find_all('a')) > 0:
                             event_lecturers_list.append(lecturer.find('a').string.strip())
+                elif non_person is not None:
+                    event_lecturers_list = [lecturers[0].find('span', {"class": "moreinfo"}).string.strip()]
                 else:
                     event_lecturers_list = [lesson.find_all('span', {"title": "Преподаватели"})[0].find('a').string.strip()]
             else:
